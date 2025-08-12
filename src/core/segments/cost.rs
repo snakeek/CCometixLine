@@ -84,35 +84,40 @@ impl CostSegment {
                             match model_name {
                                 "glm-4.5" | "glm-4" => {
                                     // GLM模型：如果total_tokens存在，估算输入输出比例
-                                    if usage.total_tokens > 0 {
-                                        // 简单估算：假设70%输入，30%输出
-                                        let estimated_input = (usage.total_tokens as f64 * 0.7) as u32;
-                                        let estimated_output = usage.total_tokens - estimated_input;
-                                        total_input_tokens += estimated_input;
-                                        total_output_tokens += estimated_output;
+                                    if let Some(total) = usage.total_tokens {
+                                        if total > 0 {
+                                            // 简单估算：假设70%输入，30%输出
+                                            let estimated_input = (total as f64 * 0.7) as u32;
+                                            let estimated_output = total - estimated_input;
+                                            total_input_tokens += estimated_input;
+                                            total_output_tokens += estimated_output;
+                                        } else {
+                                            total_input_tokens += usage.input_tokens.unwrap_or(0);
+                                            total_output_tokens += usage.output_tokens.unwrap_or(0);
+                                        }
                                     } else {
-                                        total_input_tokens += usage.input_tokens;
-                                        total_output_tokens += usage.output_tokens;
+                                        total_input_tokens += usage.input_tokens.unwrap_or(0);
+                                        total_output_tokens += usage.output_tokens.unwrap_or(0);
                                     }
                                 },
                                 "claude-3-5-sonnet-20241022" | "claude-3-haiku-20240307" => {
                                     // Claude模型使用标准字段
-                                    total_input_tokens += usage.input_tokens 
-                                        + usage.cache_creation_input_tokens 
-                                        + usage.cache_read_input_tokens;
-                                    total_output_tokens += usage.output_tokens;
+                                    total_input_tokens += usage.input_tokens.unwrap_or(0)
+                                        + usage.cache_creation_input_tokens.unwrap_or(0)
+                                        + usage.cache_read_input_tokens.unwrap_or(0);
+                                    total_output_tokens += usage.output_tokens.unwrap_or(0);
                                 },
                                 "gpt-4" | "gpt-3.5-turbo" => {
                                     // GPT模型使用标准字段
-                                    total_input_tokens += usage.input_tokens;
-                                    total_output_tokens += usage.output_tokens;
+                                    total_input_tokens += usage.input_tokens.unwrap_or(0);
+                                    total_output_tokens += usage.output_tokens.unwrap_or(0);
                                 },
                                 _ => {
                                     // 默认使用Claude的统计方式
-                                    total_input_tokens += usage.input_tokens 
-                                        + usage.cache_creation_input_tokens 
-                                        + usage.cache_read_input_tokens;
-                                    total_output_tokens += usage.output_tokens;
+                                    total_input_tokens += usage.input_tokens.unwrap_or(0)
+                                        + usage.cache_creation_input_tokens.unwrap_or(0)
+                                        + usage.cache_read_input_tokens.unwrap_or(0);
+                                    total_output_tokens += usage.output_tokens.unwrap_or(0);
                                 }
                             }
                         }
