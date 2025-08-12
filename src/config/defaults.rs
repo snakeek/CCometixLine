@@ -6,7 +6,9 @@ pub const DEFAULT_CONFIG: Config = Config {
         directory: true,
         git: true,
         model: true,
+        time: false,
         usage: true,
+        cost: true,
     },
 };
 
@@ -18,7 +20,9 @@ impl Default for Config {
                 directory: true,
                 git: true,
                 model: true,
+                time: false,
                 usage: true,
+                cost: true,
             },
         }
     }

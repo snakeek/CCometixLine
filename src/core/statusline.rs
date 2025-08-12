@@ -1,5 +1,5 @@
 use crate::config::{Config, InputData};
-use crate::core::segments::{DirectorySegment, GitSegment, ModelSegment, UsageSegment, Segment};
+use crate::core::segments::{DirectorySegment, GitSegment, ModelSegment, TimeSegment, UsageSegment, CostSegment, Segment};
 
 pub struct StatusLineGenerator {
     config: Config,
@@ -36,10 +36,22 @@ impl StatusLineGenerator {
             }
         }
         
+        if self.config.segments.time {
+            let time_segment = TimeSegment::new(true);
+            let content = time_segment.render(input);
+            segments.push(format!("\x1b[1;36m{}\x1b[0m", content));
+        }
+        
         if self.config.segments.usage {
             let usage_segment = UsageSegment::new(true);
             let content = usage_segment.render(input);
             segments.push(format!("\x1b[1;35m{}\x1b[0m", content));
+        }
+        
+        if self.config.segments.cost {
+            let cost_segment = CostSegment::new(true);
+            let content = cost_segment.render(input);
+            segments.push(format!("\x1b[1;33m{}\x1b[0m", content));
         }
         
         // Join segments with white separator
