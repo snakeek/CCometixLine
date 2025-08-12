@@ -36,15 +36,18 @@ pub struct InputData {
 
 #[derive(Deserialize)]
 pub struct Usage {
-    pub input_tokens: u32,
-    pub output_tokens: u32,
-    pub cache_read_input_tokens: u32,
-    // 智谱清言可能没有这个字段，设为可选
-    #[serde(default)]
-    pub cache_creation_input_tokens: u32,
-    // GLM模型可能有的字段
-    #[serde(default)]
-    pub total_tokens: u32,
+    // Claude-style fields
+    pub input_tokens: Option<u32>,
+    pub output_tokens: Option<u32>,
+    pub cache_creation_input_tokens: Option<u32>,
+    pub cache_read_input_tokens: Option<u32>,
+    // OpenAI-style fields with aliases for compatibility
+    #[serde(alias = "prompt_tokens")]
+    pub prompt_tokens: Option<u32>,
+    #[serde(alias = "completion_tokens")]
+    pub completion_tokens: Option<u32>,
+    #[serde(alias = "total_tokens")]
+    pub total_tokens: Option<u32>,
 }
 
 #[derive(Deserialize)]
